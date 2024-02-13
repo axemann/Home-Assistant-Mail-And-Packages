@@ -81,6 +81,8 @@ from .const import (
     SHIPPERS,
 )
 
+from .oauth import O365Auth, generate_auth_string
+
 _LOGGER = logging.getLogger(__name__)
 
 # Config Flow Helpers
@@ -155,16 +157,22 @@ def process_emails(hass: HomeAssistant, config: ConfigEntry) -> dict:
     """
     host = config.get(CONF_HOST)
     port = config.get(CONF_PORT)
+    pwd = None
     user = config.get(CONF_USERNAME)
-    pwd = config.get(CONF_PASSWORD)
+    if CONF_PASSWORD in config:
+        pwd = config.get(CONF_PASSWORD)
     folder = config.get(CONF_FOLDER)
     resources = config.get(CONF_RESOURCES)
+    app = None
 
     # Create the dict container
     data = {}
 
+    # oAuth check
+    if pwd is None:
+        app = O365Auth(config)
     # Login to email server and select the folder
-    account = login(host, port, user, pwd)
+    account = login(host, port, user, pwd, app)
 
     # Do not process if account returns false
     if not account:
@@ -422,7 +430,7 @@ def fetch(
 
 
 def login(
-    host: str, port: int, user: str | None, pwd: str
+    host: str, port: int, user: str , pwd: str | None, app: O365Auth | None
 ) -> Union[bool, Type[imaplib.IMAP4_SSL]]:
     """Login to IMAP server.
 
@@ -437,7 +445,8 @@ def login(
         return False
 
     # If login fails give error message
-    if user is None:
+    if app:
+        pwd = generate_auth_string(user, app.token)
         try:
             account.authenticate("XOAUTH2", lambda x: pwd.encode("utf-8"))
         except Exception as err:
