@@ -10,46 +10,63 @@
             "amazon_domain": "Invalid forwarding email address.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "",
+            "tenant": ""
         },
         "step": {
             "user": {
-                "data": {
-                    "host": "Házigazda",
-                    "password": "Jelszó",
-                    "port": "Kikötő",
-                    "username": "Felhasználónév"
-                },
                 "description": "Kérjük, adja meg a levelezőszerver csatlakozási adatait.",
-                "title": "Levél és csomagok (1. lépés a 2-ből)"
+                "menu_options": {
+                    "manual": "",
+                    "o365": ""
+                }
+            },
+            "o365": {
+                "description": "",
+                "data": {
+                    "username": "",
+                    "tenant": "",
+                    "client_id": "",
+                    "secret": ""
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "",
+                    "password": "",
+                    "port": "",
+                    "username": ""
+                },
+                "description": "Kérjük, adja meg a levelezőszervere kapcsolati adatait.",
+                "title": ""
             },
             "config_2": {
                 "data": {
                     "folder": "Mail mappa",
+                    "resources": "Sensors List",
                     "scan_interval": "Beolvasási időköz (perc)",
                     "image_path": "Kép elérési útja",
                     "gif_duration": "Kép időtartama (másodpercben)",
                     "image_security": "Véletlen képfájlnév",
-                    "generate_mp4": "Készítsen mp4-et a képekből",
-                    "resources": "Sensors List",
                     "imap_timeout": "Time in seconds before connection timeout (seconds, minimum 10)",
+                    "generate_mp4": "Készítsen mp4-et a képekből",
                     "amazon_fwds": "Amazon fowarded email addresses",
-                    "allow_external": "Create image for notification apps",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Create image for notification apps",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "Végezze el a konfigurációt az alábbiak testreszabásával az e-mail struktúrája és a Home Assistant telepítése alapján. \n\n A [Levelek és csomagok integrációja] (https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) opciókkal kapcsolatban tekintse meg a [konfiguráció, sablonok , és az automatizálás szakasz] (https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) a GitHubon.",
+                "description": "Végezze el a konfigurációt az alábbiak testreszabásával az e-mail struktúrája és a Home Assistant telepítése alapján. \n\n A [Levelek és csomagok integrációja] (https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) opciókkal kapcsolatban tekintse meg a [konfiguráció, sablonok , és az automatizálás szakasz] (https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) a GitHubon.",
                 "title": "Levél és csomagok (2. lépés a 2-ből)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
-        },
-        "title": "Mail and Packages"
+        }
     },
     "options": {
         "error": {
@@ -59,45 +76,62 @@
             "amazon_domain": "Érvénytelen továbbítási e-mail cím.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "Hiba történt a token beszerzésekor, kérjük ellenőrizze a bérlő azonosítóját, a kliens azonosítóját és a titkot.",
+            "tenant": "Missing tenant ID"
         },
         "step": {
-            "init": {
+            "user": {
+                "description": "Válassza ki a levelezőszerver hitelesítési módszerét.",
+                "menu_options": {
+                    "manual": "Szabványos IMAP felhasználónév és jelszó.",
+                    "o365": "Office 365 oAuth"
+                }
+            },
+            "o365": {
+                "description": "Kérjük, adja meg az oAuth hitelesítő adatait itt.\nKérjük, tekintse meg [ezt](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#office-365-wip) a wiki szakaszt, hogy hogyan állíthatja be a hitelesítő adatokat.",
                 "data": {
-                    "host": "Házigazda",
-                    "password": "Jelszó",
-                    "port": "Kikötő",
+                    "username": "Username",
+                    "tenant": "Bérlő azonosító",
+                    "client_id": "Ügyfél ID",
+                    "secret": "Titok"
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "Host",
+                    "password": "Password",
+                    "port": "Port",
                     "username": "Felhasználónév"
                 },
-                "description": "Kérjük, adja meg a levelezőszerver csatlakozási adatait.",
-                "title": "Levél és csomagok (1. lépés a 2-ből)"
+                "description": "Kérjük, adja meg a levelezőszervere kapcsolati adatait.",
+                "title": "Levelek és csomagok (1. lépés a 2-ből)"
             },
             "options_2": {
                 "data": {
                     "folder": "Mail mappa",
+                    "resources": "Érzékelők listája",
                     "scan_interval": "Beolvasási időköz (perc)",
                     "image_path": "Kép elérési útja",
                     "gif_duration": "Kép időtartama (másodpercben)",
                     "image_security": "Véletlen képfájlnév",
-                    "generate_mp4": "Készítsen mp4-et a képekből",
-                    "resources": "Érzékelők listája",
                     "imap_timeout": "Idő másodpercben a csatlakozás időtúllépése előtt (másodperc, minimum 10)",
+                    "generate_mp4": "Készítsen mp4-et a képekből",
                     "amazon_fwds": "Amazon forwarded email addresses",
-                    "allow_external": "Kép létrehozása az értesítési alkalmazásokhoz",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Kép létrehozása az értesítési alkalmazásokhoz",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "Végezze el a konfigurációt az alábbiak testreszabásával az e-mail struktúrája és a Home Assistant telepítése alapján. \n\n A [Levelek és csomagok integrációja](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) opciókkal kapcsolatban tekintse meg a [konfiguráció, sablonok , és az automatizálás szakasz](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) a GitHubon.",
+                "description": "Végezze el a konfigurációt az alábbiak testreszabásával az e-mail struktúrája és a Home Assistant telepítése alapján. \n\n A [Levelek és csomagok integrációja](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) opciókkal kapcsolatban tekintse meg a [konfiguráció, sablonok , és az automatizálás szakasz](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) a GitHubon.",
                 "title": "Levél és csomagok (2. lépés a 2-ből)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
         }
-    },
-    "title": "Mail and Packages"
+    }
 }

@@ -10,46 +10,63 @@
             "amazon_domain": "Invalid forwarding email address.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "",
+            "tenant": ""
         },
         "step": {
             "user": {
-                "data": {
-                    "host": "主辦",
-                    "password": "密碼",
-                    "port": "港口",
-                    "username": "用戶名"
-                },
                 "description": "請輸入您的郵件服務器的連接信息。",
-                "title": "郵件和包裹（第1步，共2步）"
+                "menu_options": {
+                    "manual": "",
+                    "o365": ""
+                }
+            },
+            "o365": {
+                "description": "",
+                "data": {
+                    "username": "",
+                    "tenant": "",
+                    "client_id": "",
+                    "secret": ""
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "",
+                    "password": "",
+                    "port": "",
+                    "username": ""
+                },
+                "description": "請輸入您的郵件伺服器的連接資訊。",
+                "title": ""
             },
             "config_2": {
                 "data": {
                     "folder": "郵件文件夾",
+                    "resources": "Sensors List",
                     "scan_interval": "掃描間隔（分鐘）",
                     "image_path": "圖像路徑",
                     "gif_duration": "圖像持續時間（秒）",
                     "image_security": "隨機圖像文件名",
-                    "generate_mp4": "從圖像創建mp4",
-                    "resources": "Sensors List",
                     "imap_timeout": "Time in seconds before connection timeout (seconds, minimum 10)",
+                    "generate_mp4": "從圖像創建mp4",
                     "amazon_fwds": "Amazon fowarded email addresses",
-                    "allow_external": "Create image for notification apps",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Create image for notification apps",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "通過根據您的電子郵件結構和Home Assistant安裝自定義以下內容來完成配置。 \n\n有關[郵件和軟件包集成]（https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration）選項的詳細信息，請查看[配置，模板和自動化部分]（GitHub上的https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration）。",
+                "description": "通過根據您的電子郵件結構和Home Assistant安裝自定義以下內容來完成配置。 \n\n有關[郵件和軟件包集成]（https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration）選項的詳細信息，請查看[配置，模板和自動化部分]（GitHub上的https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration）。",
                 "title": "郵件和包裹（第2步，共2步）"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
-        },
-        "title": "Mail and Packages"
+        }
     },
     "options": {
         "error": {
@@ -59,45 +76,62 @@
             "amazon_domain": "無效的轉發電子郵件地址。",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "獲取令牌出錯，請檢查您的租戶ID、客戶端ID和密碼。",
+            "tenant": "Missing tenant ID"
         },
         "step": {
-            "init": {
+            "user": {
+                "description": "選擇郵件伺服器驗證方法。",
+                "menu_options": {
+                    "manual": "標準 IMAP 用戶名和密碼。",
+                    "o365": "Office 365 oAuth"
+                }
+            },
+            "o365": {
+                "description": "請在此處輸入您的 oAuth 憑證。\n請參閱 [此處](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#office-365-wip) 的 wiki 部分，了解如何設定憑證。",
                 "data": {
-                    "host": "主辦",
-                    "password": "密碼",
-                    "port": "港口",
+                    "username": "Username",
+                    "tenant": "租戶ID",
+                    "client_id": "客戶ID",
+                    "secret": "秘密"
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "Host",
+                    "password": "Password",
+                    "port": "Port",
                     "username": "用戶名"
                 },
-                "description": "請輸入您的郵件服務器的連接信息。",
+                "description": "請輸入您的郵件伺服器的連接資訊。",
                 "title": "郵件和包裹（第1步，共2步）"
             },
             "options_2": {
                 "data": {
                     "folder": "郵件文件夾",
+                    "resources": "傳感器清單",
                     "scan_interval": "掃描間隔（分鐘）",
                     "image_path": "圖像路徑",
                     "gif_duration": "圖像持續時間（秒）",
                     "image_security": "隨機圖像文件名",
-                    "generate_mp4": "從圖像創建mp4",
-                    "resources": "傳感器清單",
                     "imap_timeout": "連接超時之前的時間（以秒為單位）（秒，至少10）",
+                    "generate_mp4": "從圖像創建mp4",
                     "amazon_fwds": "Amazon forwarded email addresses",
-                    "allow_external": "為通知應用創建圖像",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "為通知應用創建圖像",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "通過根據您的電子郵件結構和Home Assistant安裝自定義以下內容來完成配置。 \n\n有關[郵件和軟件包集成](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration)選項的詳細信息，請查看[配置，模板和自動化部分](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) GitHub上的。",
+                "description": "通過根據您的電子郵件結構和Home Assistant安裝自定義以下內容來完成配置。 \n\n有關[郵件和軟件包集成](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration)選項的詳細信息，請查看[配置，模板和自動化部分](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) GitHub上的。",
                 "title": "郵件和包裹（第2步，共2步）"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
         }
-    },
-    "title": "Mail and Packages"
+    }
 }

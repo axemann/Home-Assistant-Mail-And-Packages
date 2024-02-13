@@ -10,46 +10,63 @@
             "amazon_domain": "Invalid forwarding email address.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "",
+            "tenant": ""
         },
         "step": {
             "user": {
-                "data": {
-                    "host": "Hospedeiro",
-                    "password": "Senha",
-                    "port": "Porta",
-                    "username": "Nome do usuário"
-                },
                 "description": "Por favor, insira as informações de conexão do seu servidor de correio.",
-                "title": "Correio e pacotes (Etapa 1 de 2)"
+                "menu_options": {
+                    "manual": "",
+                    "o365": ""
+                }
+            },
+            "o365": {
+                "description": "",
+                "data": {
+                    "username": "",
+                    "tenant": "",
+                    "client_id": "",
+                    "secret": ""
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "",
+                    "password": "",
+                    "port": "",
+                    "username": ""
+                },
+                "description": "Por favor, insira as informações de conexão do seu servidor de email.",
+                "title": ""
             },
             "config_2": {
                 "data": {
                     "folder": "Pasta de Correio",
+                    "resources": "Sensors List",
                     "scan_interval": "Intervalo de digitalização (minutos)",
                     "image_path": "Caminho da imagem",
                     "gif_duration": "Duração da imagem (segundos)",
                     "image_security": "Nome da imagem aleatória",
-                    "generate_mp4": "Crie mp4 a partir de imagens",
-                    "resources": "Sensors List",
                     "imap_timeout": "Time in seconds before connection timeout (seconds, minimum 10)",
+                    "generate_mp4": "Crie mp4 a partir de imagens",
                     "amazon_fwds": "Amazon fowarded email addresses",
-                    "allow_external": "Create image for notification apps",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Create image for notification apps",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "Conclua a configuração, personalizando o seguinte com base na sua estrutura de email e instalação do Home Assistant. \n\n Para obter detalhes sobre as opções [integração de Mail e Pacotes] (https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration), revise as opções de [configuração, modelos e seção de automações] (https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) no GitHub.",
+                "description": "Conclua a configuração, personalizando o seguinte com base na sua estrutura de email e instalação do Home Assistant. \n\n Para obter detalhes sobre as opções [integração de Mail e Pacotes] (https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration), revise as opções de [configuração, modelos e seção de automações] (https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) no GitHub.",
                 "title": "Correio e pacotes (Etapa 2 de 2)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
-        },
-        "title": "Mail and Packages"
+        }
     },
     "options": {
         "error": {
@@ -59,45 +76,62 @@
             "amazon_domain": "Endereço de email de encaminhamento inválido.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "Erro ao obter token, por favor verifique o seu id de inquilino, id de cliente e segredo.",
+            "tenant": "Missing tenant ID"
         },
         "step": {
-            "init": {
+            "user": {
+                "description": "Selecione o método de autenticação do servidor de correio.",
+                "menu_options": {
+                    "manual": "Nome de usuário e senha IMAP padrão.",
+                    "o365": "Office 365 oAuth"
+                }
+            },
+            "o365": {
+                "description": "Por favor, insira suas credenciais oAuth aqui.\nConsulte [esta](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#office-365-wip) seção na wiki sobre como configurar as credenciais.",
                 "data": {
-                    "host": "Hospedeiro",
-                    "password": "Senha",
-                    "port": "Porta",
-                    "username": "Nome do usuário"
+                    "username": "Username",
+                    "tenant": "ID do Inquilino",
+                    "client_id": "ID do Cliente",
+                    "secret": "Segredo"
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "Host",
+                    "password": "Password",
+                    "port": "Port",
+                    "username": "Nome de usuário"
                 },
-                "description": "Por favor, insira as informações de conexão do seu servidor de correio.",
-                "title": "Correio e pacotes (Etapa 1 de 2)"
+                "description": "Por favor, insira as informações de conexão do seu servidor de email.",
+                "title": "Correio e Pacotes (Etapa 1 de 2)"
             },
             "options_2": {
                 "data": {
                     "folder": "Pasta de Correio",
+                    "resources": "Lista de Sensores",
                     "scan_interval": "Intervalo de digitalização (minutos)",
                     "image_path": "Caminho da imagem",
                     "gif_duration": "Duração da imagem (segundos)",
                     "image_security": "Nome da imagem aleatória",
-                    "generate_mp4": "Crie mp4 a partir de imagens",
-                    "resources": "Lista de Sensores",
                     "imap_timeout": "Tempo em segundos antes do tempo limite da conexão (segundos, mínimo 10)",
+                    "generate_mp4": "Crie mp4 a partir de imagens",
                     "amazon_fwds": "Amazon forwarded email addresses",
-                    "allow_external": "Criar imagem para aplicativos de notificação",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Criar imagem para aplicativos de notificação",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "Conclua a configuração, personalizando o seguinte com base na sua estrutura de email e instalação do Home Assistant. \n\n Para obter detalhes sobre as opções [integração de Mail e Pacotes](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration), revise as opções de [configuração, modelos e seção de automações](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) no GitHub.",
+                "description": "Conclua a configuração, personalizando o seguinte com base na sua estrutura de email e instalação do Home Assistant. \n\n Para obter detalhes sobre as opções [integração de Mail e Pacotes](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration), revise as opções de [configuração, modelos e seção de automações](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) no GitHub.",
                 "title": "Correio e pacotes (Etapa 2 de 2)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
         }
-    },
-    "title": "Mail and Packages"
+    }
 }

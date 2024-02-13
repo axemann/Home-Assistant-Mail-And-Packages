@@ -10,10 +10,28 @@
       "amazon_domain": "Invalid forwarding email address.",
       "file_not_found": "Image file not found",
       "scan_too_low": "Scan interval too low (minimum 5)",
-      "timeout_too_low": "IMAP timeout too low (minumim 10)"
+      "timeout_too_low": "IMAP timeout too low (minumim 10)",
+      "token": "Error obtaining token, please check your tenant id, client id, and secret.",
+      "tenant": "Missing tenant ID"
     },
     "step": {
       "user": {
+        "description": "Select mail server authentication method.",
+        "menu_options": {
+            "manual": "Standard IMAP username and password.",
+            "o365": "Office 365 oAuth"
+        }        
+      },
+      "o365": {
+        "description": "Please enter your oAuth credentials here.\nPlease see [this](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#office-365-wip) section in the wiki on how to setup credentials.",
+        "data": {
+          "username": "Username",
+          "tenant": "Tenant ID",
+          "client_id": "Client ID",
+          "secret": "Secret"
+        }
+      },
+      "manual": {
         "data": {
           "host": "Host",
           "password": "Password",
@@ -58,10 +76,28 @@
       "amazon_domain": "Invalid forwarding email address.",
       "file_not_found": "Image file not found",
       "scan_too_low": "Scan interval too low (minimum 5)",
-      "timeout_too_low": "IMAP timeout too low (minumim 10)"
+      "timeout_too_low": "IMAP timeout too low (minumim 10)",
+      "token": "Error obtaining token, please check your tenant id, client id, and secret.",
+      "tenant": "Missing tenant ID"
     },
     "step": {
-      "init": {
+      "user": {
+        "description": "Select mail server authentication method.",
+        "menu_options": {
+            "manual": "Standard IMAP username and password.",
+            "o365": "Office 365 oAuth"
+        }        
+      },
+      "o365": {
+        "description": "Please enter your oAuth credentials here.\nPlease see [this](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#office-365-wip) section in the wiki on how to setup credentials.",
+        "data": {
+          "username": "Username",
+          "tenant": "Tenant ID",
+          "client_id": "Client ID",
+          "secret": "Secret"
+        }
+      },      
+      "manual": {
         "data": {
           "host": "Host",
           "password": "Password",

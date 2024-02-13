@@ -10,46 +10,63 @@
             "amazon_domain": "Invalid forwarding email address.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "",
+            "tenant": ""
         },
         "step": {
             "user": {
-                "data": {
-                    "host": "Gastheer",
-                    "password": "Wachtwoord",
-                    "port": "Haven",
-                    "username": "Gebruikersnaam"
-                },
                 "description": "Voer de verbindingsgegevens van uw mailserver in.",
-                "title": "Mail en pakketten (stap 1 van 2)"
+                "menu_options": {
+                    "manual": "",
+                    "o365": ""
+                }
+            },
+            "o365": {
+                "description": "",
+                "data": {
+                    "username": "",
+                    "tenant": "",
+                    "client_id": "",
+                    "secret": ""
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "",
+                    "password": "",
+                    "port": "",
+                    "username": ""
+                },
+                "description": "Vul de verbindingsinformatie van uw mailserver in.",
+                "title": ""
             },
             "config_2": {
                 "data": {
                     "folder": "E-mailmap",
+                    "resources": "Sensors List",
                     "scan_interval": "Scaninterval (minuten)",
                     "image_path": "Afbeeldingspad",
                     "gif_duration": "Beeldduur (seconden)",
                     "image_security": "Bestandsnaam willekeurige afbeelding",
-                    "generate_mp4": "Maak mp4 van afbeeldingen",
-                    "resources": "Sensors List",
                     "imap_timeout": "Time in seconds before connection timeout (seconds, minimum 10)",
+                    "generate_mp4": "Maak mp4 van afbeeldingen",
                     "amazon_fwds": "Amazon fowarded email addresses",
-                    "allow_external": "Create image for notification apps",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Create image for notification apps",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "Voltooi de configuratie door het volgende aan te passen op basis van uw e-mailstructuur en Home Assistant-installatie. \n\n Voor meer informatie over de [E-mail en pakketten integratie] (https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) opties bekijk de [configuratie, sjablonen , en automatisering sectie] (https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) op GitHub.",
+                "description": "Voltooi de configuratie door het volgende aan te passen op basis van uw e-mailstructuur en Home Assistant-installatie. \n\n Voor meer informatie over de [E-mail en pakketten integratie] (https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) opties bekijk de [configuratie, sjablonen , en automatisering sectie] (https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) op GitHub.",
                 "title": "Mail en pakketten (stap 2 van 2)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
-        },
-        "title": "Mail and Packages"
+        }
     },
     "options": {
         "error": {
@@ -59,45 +76,62 @@
             "amazon_domain": "Ongeldig e-mailadres voor doorsturen.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "Fout bij het verkrijgen van token, controleer alstublieft uw tenant id, client id en geheim.",
+            "tenant": "Missing tenant ID"
         },
         "step": {
-            "init": {
+            "user": {
+                "description": "Selecteer de authenticatiemethode voor de mailserver.",
+                "menu_options": {
+                    "manual": "Standaard IMAP-gebruikersnaam en wachtwoord.",
+                    "o365": "Office 365 oAuth"
+                }
+            },
+            "o365": {
+                "description": "Vul hier uw oAuth-gegevens in.\nZie [dit](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#office-365-wip) gedeelte in de wiki over hoe u inloggegevens instelt.",
                 "data": {
-                    "host": "Gastheer",
-                    "password": "Wachtwoord",
-                    "port": "Haven",
+                    "username": "Username",
+                    "tenant": "Huurder ID",
+                    "client_id": "Klant ID",
+                    "secret": "Geheim"
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "Host",
+                    "password": "Password",
+                    "port": "Port",
                     "username": "Gebruikersnaam"
                 },
-                "description": "Voer de verbindingsgegevens van uw mailserver in.",
-                "title": "Mail en pakketten (stap 1 van 2)"
+                "description": "Vul de verbindingsinformatie van uw mailserver in.",
+                "title": "Mail en Pakketten (Stap 1 van 2)"
             },
             "options_2": {
                 "data": {
                     "folder": "E-mailmap",
+                    "resources": "Sensoren lijst",
                     "scan_interval": "Scaninterval (minuten)",
                     "image_path": "Afbeeldingspad",
                     "gif_duration": "Beeldduur (seconden)",
                     "image_security": "Bestandsnaam willekeurige afbeelding",
-                    "generate_mp4": "Maak mp4 van afbeeldingen",
-                    "resources": "Sensoren lijst",
                     "imap_timeout": "Tijd in seconden voordat verbinding wordt verbroken (seconden, minimaal 10)",
+                    "generate_mp4": "Maak mp4 van afbeeldingen",
                     "amazon_fwds": "Amazon forwarded email addresses",
-                    "allow_external": "Maak een afbeelding voor meldings-apps",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Maak een afbeelding voor meldings-apps",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "Voltooi de configuratie door het volgende aan te passen op basis van uw e-mailstructuur en Home Assistant-installatie. \n\n Voor meer informatie over de [E-mail en pakketten integratie](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) opties bekijk de [configuratie, sjablonen , en automatisering sectie](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) op GitHub.",
+                "description": "Voltooi de configuratie door het volgende aan te passen op basis van uw e-mailstructuur en Home Assistant-installatie. \n\n Voor meer informatie over de [E-mail en pakketten integratie](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) opties bekijk de [configuratie, sjablonen , en automatisering sectie](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) op GitHub.",
                 "title": "Mail en pakketten (stap 2 van 2)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
         }
-    },
-    "title": "Mail and Packages"
+    }
 }

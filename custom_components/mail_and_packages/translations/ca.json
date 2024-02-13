@@ -10,46 +10,63 @@
             "amazon_domain": "Invalid forwarding email address.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "",
+            "tenant": ""
         },
         "step": {
             "user": {
+                "description": "Introduïu la informació de connexió del vostre servidor de correu.",
+                "menu_options": {
+                    "manual": "",
+                    "o365": ""
+                }
+            },
+            "o365": {
+                "description": "",
                 "data": {
-                    "host": "Amfitrió",
-                    "password": "Contrasenya",
-                    "port": "Port",
-                    "username": "Nom d'usuari"
+                    "username": "",
+                    "tenant": "",
+                    "client_id": "",
+                    "secret": ""
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "",
+                    "password": "",
+                    "port": "",
+                    "username": ""
                 },
                 "description": "Introduïu la informació de connexió del vostre servidor de correu.",
-                "title": "Correu i paquets (pas 1 de 2)"
+                "title": ""
             },
             "config_2": {
                 "data": {
                     "folder": "Carpeta de correu",
+                    "resources": "Sensors List",
                     "scan_interval": "Interval d'exploració (minuts)",
                     "image_path": "Camí de la imatge",
                     "gif_duration": "Durada de la imatge (segons)",
                     "image_security": "Nom del fitxer d’imatge aleatòria",
-                    "generate_mp4": "Crea mp4 a partir d’imatges",
-                    "resources": "Sensors List",
                     "imap_timeout": "Time in seconds before connection timeout (seconds, minimum 10)",
+                    "generate_mp4": "Crea mp4 a partir d’imatges",
                     "amazon_fwds": "Amazon fowarded email addresses",
-                    "allow_external": "Create image for notification apps",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Create image for notification apps",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "Finalitzeu la configuració personalitzant la següent en funció de la vostra instal·lació de correu electrònic i la instal·lació d’assistència a casa. \n\n Per obtenir més informació sobre les opcions [Integració de paquets i correus] (https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration), reviseu les opcions [configuració, plantilles , secció i automatitzacions] (https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) a GitHub.",
+                "description": "Finalitzeu la configuració personalitzant la següent en funció de la vostra instal·lació de correu electrònic i la instal·lació d’assistència a casa. \n\n Per obtenir més informació sobre les opcions [Integració de paquets i correus] (https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration), reviseu les opcions [configuració, plantilles , secció i automatitzacions] (https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) a GitHub.",
                 "title": "Correu i paquets (pas 2 de 2)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
-        },
-        "title": "Mail and Packages"
+        }
     },
     "options": {
         "error": {
@@ -59,45 +76,62 @@
             "amazon_domain": "Adreça de correu electrònic de reenviament no vàlida.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "Error en obtenir el token, si us plau, comprova el teu id de llogater, id de client i secret.",
+            "tenant": "Missing tenant ID"
         },
         "step": {
-            "init": {
+            "user": {
+                "description": "Seleccioneu el mètode d'autenticació del servidor de correu.",
+                "menu_options": {
+                    "manual": "Nom d'usuari i contrasenya IMAP estàndard.",
+                    "o365": "Office 365 oAuth"
+                }
+            },
+            "o365": {
+                "description": "Introduïu les vostres credencials oAuth aquí.\nConsulteu [aquesta](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#office-365-wip) secció a la wiki sobre com configurar les credencials.",
                 "data": {
-                    "host": "Amfitrió",
-                    "password": "Contrasenya",
+                    "username": "Username",
+                    "tenant": "ID del llogater",
+                    "client_id": "ID del client",
+                    "secret": "Secret"
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "Host",
+                    "password": "Password",
                     "port": "Port",
                     "username": "Nom d'usuari"
                 },
                 "description": "Introduïu la informació de connexió del vostre servidor de correu.",
-                "title": "Correu i paquets (pas 1 de 2)"
+                "title": "Correu i paquets (Pas 1 de 2)"
             },
             "options_2": {
                 "data": {
                     "folder": "Carpeta de correu",
+                    "resources": "Llista de sensors",
                     "scan_interval": "Interval d'exploració (minuts)",
                     "image_path": "Camí de la imatge",
                     "gif_duration": "Durada de la imatge (segons)",
                     "image_security": "Nom del fitxer d’imatge aleatòria",
-                    "generate_mp4": "Crea mp4 a partir d’imatges",
-                    "resources": "Llista de sensors",
                     "imap_timeout": "Temps en segons abans del temps d'espera de la connexió (segons, mínim 10)",
+                    "generate_mp4": "Crea mp4 a partir d’imatges",
                     "amazon_fwds": "Amazon forwarded email addresses",
-                    "allow_external": "Crea una imatge per a aplicacions de notificació",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Crea una imatge per a aplicacions de notificació",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "Finalitzeu la configuració personalitzant la següent en funció de la vostra instal·lació de correu electrònic i la instal·lació d’assistència a casa. \n\n Per obtenir més informació sobre les opcions [Integració de paquets i correus](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration), reviseu les opcions [configuració, plantilles , secció i automatitzacions](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) a GitHub.",
+                "description": "Finalitzeu la configuració personalitzant la següent en funció de la vostra instal·lació de correu electrònic i la instal·lació d’assistència a casa. \n\n Per obtenir més informació sobre les opcions [Integració de paquets i correus](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration), reviseu les opcions [configuració, plantilles , secció i automatitzacions](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) a GitHub.",
                 "title": "Correu i paquets (pas 2 de 2)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
         }
-    },
-    "title": "Mail and Packages"
+    }
 }

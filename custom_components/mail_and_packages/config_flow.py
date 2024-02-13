@@ -4,6 +4,7 @@ import logging
 from os import path
 from typing import Any
 
+from homeassistant.data_entry_flow import FlowResult
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant import config_entries
@@ -15,6 +16,8 @@ from homeassistant.const import (
     CONF_USERNAME,
 )
 from homeassistant.core import callback
+
+from .oauth import O365Auth, TokenError, MissingTenantID, generate_auth_string
 
 from .const import (
     CONF_ALLOW_EXTERNAL,
@@ -29,6 +32,10 @@ from .const import (
     CONF_IMAP_TIMEOUT,
     CONF_PATH,
     CONF_SCAN_INTERVAL,
+    CONF_O365_CLIENT_ID,
+    CONF_O365_SECRET,
+    CONF_O365_TENANT,
+    CONF_OUTLOOK_DEFAULTS,
     DEFAULT_ALLOW_EXTERNAL,
     DEFAULT_AMAZON_DAYS,
     DEFAULT_AMAZON_FWDS,
@@ -43,9 +50,10 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
-from .helpers import _check_ffmpeg, _test_login, get_resources, login
+from .helpers import check_ffmpeg, test_login, get_resources, login
 
 _LOGGER = logging.getLogger(__name__)
+MENU_OPTIONS = ["manual", "o365"]
 
 
 async def _check_amazon_forwards(forwards: str) -> tuple:
@@ -96,7 +104,7 @@ async def _validate_user_input(user_input: dict) -> tuple:
 
     # Check for ffmpeg if option enabled
     if user_input[CONF_GENERATE_MP4]:
-        valid = await _check_ffmpeg()
+        valid = await check_ffmpeg()
     else:
         valid = True
 
@@ -123,9 +131,12 @@ async def _validate_user_input(user_input: dict) -> tuple:
     return errors, user_input
 
 
-def _get_mailboxes(host: str, port: int, user: str, pwd: str) -> list:
+def _get_mailboxes(host: str, port: int, user: str | None, pwd: str) -> list:
     """Get list of mailbox folders from mail server."""
-    account = login(host, port, user, pwd)
+    if user is None:
+        account = login(host, port, None, pwd)
+    else:
+        account = login(host, port, user, pwd)
 
     status, folderlist = account.list()
     mailboxes = []
@@ -148,6 +159,31 @@ def _get_mailboxes(host: str, port: int, user: str, pwd: str) -> list:
     return mailboxes
 
 
+def _get_schema_step_o365(user_input: list, default_dict: list) -> Any:
+    """Get a schema using the default_dict as a backup."""
+    if user_input is None:
+        user_input = {}
+
+    def _get_default(key: str, fallback_default: Any = None) -> None:
+        """Get default value for key."""
+        return user_input.get(key, default_dict.get(key, fallback_default))
+
+    return vol.Schema(
+        {
+            vol.Required(CONF_USERNAME, default=_get_default(CONF_USERNAME)): cv.string,
+            vol.Required(
+                CONF_O365_TENANT, default=_get_default(CONF_O365_TENANT)
+            ): cv.string,
+            vol.Required(
+                CONF_O365_CLIENT_ID, default=_get_default(CONF_O365_CLIENT_ID)
+            ): cv.string,
+            vol.Required(
+                CONF_O365_SECRET, default=_get_default(CONF_O365_SECRET)
+            ): cv.string,
+        }
+    )
+
+
 def _get_schema_step_1(user_input: list, default_dict: list) -> Any:
     """Get a schema using the default_dict as a backup."""
     if user_input is None:
@@ -159,10 +195,10 @@ def _get_schema_step_1(user_input: list, default_dict: list) -> Any:
 
     return vol.Schema(
         {
-            vol.Required(CONF_HOST, default=_get_default(CONF_HOST)): str,
+            vol.Required(CONF_HOST, default=_get_default(CONF_HOST)): cv.string,
             vol.Required(CONF_PORT, default=_get_default(CONF_PORT)): vol.Coerce(int),
-            vol.Required(CONF_USERNAME, default=_get_default(CONF_USERNAME)): str,
-            vol.Required(CONF_PASSWORD, default=_get_default(CONF_PASSWORD)): str,
+            vol.Required(CONF_USERNAME, default=_get_default(CONF_USERNAME)): cv.string,
+            vol.Required(CONF_PASSWORD, default=_get_default(CONF_PASSWORD)): cv.string,
         }
     )
 
@@ -176,20 +212,34 @@ def _get_schema_step_2(data: list, user_input: list, default_dict: list) -> Any:
         """Get default value for key."""
         return user_input.get(key, default_dict.get(key, fallback_default))
 
+    # No password, likely oAuth login
+    if CONF_PASSWORD not in data:
+        if CONF_O365_TENANT in data:
+            app = O365Auth(data)
+            app.client()
+            password = generate_auth_string(data[CONF_USERNAME], app.token)
+            mailboxes = _get_mailboxes(
+                data[CONF_HOST],
+                data[CONF_PORT],
+                None,
+                password,
+            )
+    else:
+        mailboxes = _get_mailboxes(
+            data[CONF_HOST], data[CONF_PORT], data[CONF_USERNAME], data[CONF_PASSWORD]
+        )
+
     return vol.Schema(
         {
             vol.Required(CONF_FOLDER, default=_get_default(CONF_FOLDER)): vol.In(
-                _get_mailboxes(
-                    data[CONF_HOST],
-                    data[CONF_PORT],
-                    data[CONF_USERNAME],
-                    data[CONF_PASSWORD],
-                )
+                mailboxes
             ),
             vol.Required(
                 CONF_RESOURCES, default=_get_default(CONF_RESOURCES)
             ): cv.multi_select(get_resources()),
-            vol.Optional(CONF_AMAZON_FWDS, default=_get_default(CONF_AMAZON_FWDS)): str,
+            vol.Optional(
+                CONF_AMAZON_FWDS, default=_get_default(CONF_AMAZON_FWDS)
+            ): cv.string,
             vol.Optional(CONF_AMAZON_DAYS, default=_get_default(CONF_AMAZON_DAYS)): int,
             vol.Optional(
                 CONF_SCAN_INTERVAL, default=_get_default(CONF_SCAN_INTERVAL)
@@ -202,11 +252,13 @@ def _get_schema_step_2(data: list, user_input: list, default_dict: list) -> Any:
             ): vol.Coerce(int),
             vol.Optional(
                 CONF_GENERATE_MP4, default=_get_default(CONF_GENERATE_MP4)
-            ): bool,
+            ): cv.boolean,
             vol.Optional(
                 CONF_ALLOW_EXTERNAL, default=_get_default(CONF_ALLOW_EXTERNAL)
-            ): bool,
-            vol.Optional(CONF_CUSTOM_IMG, default=_get_default(CONF_CUSTOM_IMG)): bool,
+            ): cv.boolean,
+            vol.Optional(
+                CONF_CUSTOM_IMG, default=_get_default(CONF_CUSTOM_IMG)
+            ): cv.boolean,
         }
     )
 
@@ -225,7 +277,7 @@ def _get_schema_step_3(user_input: list, default_dict: list) -> Any:
             vol.Optional(
                 CONF_CUSTOM_IMG_FILE,
                 default=_get_default(CONF_CUSTOM_IMG_FILE, DEFAULT_CUSTOM_IMG_FILE),
-            ): str,
+            ): cv.string,
         }
     )
 
@@ -242,13 +294,63 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         self._data = {}
         self._errors = {}
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the flow initialized by the user."""
+        return self.async_show_menu(step_id="user", menu_options=MENU_OPTIONS)
+
+    async def async_step_o365(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Office 365 config flow."""
+        self._errors = {}
+
+        if user_input is not None:
+            user_input.update(CONF_OUTLOOK_DEFAULTS)
+            self._data.update(user_input)
+            app = O365Auth(user_input)
+            self._problem = None
+            valid = False
+
+            try:
+                app.client()
+                valid = True
+            except TokenError:
+                _LOGGER.error("Problems obtaining oAuth token.")
+                self._problem = "token"
+            except MissingTenantID:
+                _LOGGER.error("Missing tenant ID.")
+                self._problem = "tenant"
+
+            if not valid:
+                self._errors["base"] = self._problem
+            else:
+
+                return await self.async_step_config_2()
+
+            return await self._show_config_o365(user_input)
+
+        return await self._show_config_o365(user_input)
+
+    async def _show_config_o365(self, user_input):
+        """Show the configuration form to edit configuration data."""
+        # Defaults
+        defaults = {}
+
+        return self.async_show_form(
+            step_id="user",
+            data_schema=_get_schema_step_o365(user_input, defaults),
+            errors=self._errors,
+        )
+
+    async def async_step_manual(self, user_input=None):
         """Handle a flow initialized by the user."""
         self._errors = {}
 
         if user_input is not None:
             self._data.update(user_input)
-            valid = await _test_login(
+            valid = await test_login(
                 user_input[CONF_HOST],
                 user_input[CONF_PORT],
                 user_input[CONF_USERNAME],

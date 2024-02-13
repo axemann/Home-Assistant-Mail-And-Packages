@@ -54,6 +54,17 @@ CONF_IMAP_TIMEOUT = "imap_timeout"
 CONF_GENERATE_MP4 = "generate_mp4"
 CONF_AMAZON_FWDS = "amazon_fwds"
 CONF_AMAZON_DAYS = "amazon_days"
+CONF_TOKEN = "access_token"
+
+# Office 365 Config
+CONF_OUTLOOK_DEFAULTS = {
+    "host": "outlook.office365.com",
+    "port": 993,
+}
+CONF_O365_TENANT = "tenant"
+CONF_O365_CLIENT_ID = "client_id"
+CONF_O365_SECRET = "secret"
+CONF_O365_SCOPE = "https://outlook.office365.com/.default"
 
 # Defaults
 DEFAULT_CAMERA_NAME = "Mail USPS Camera"

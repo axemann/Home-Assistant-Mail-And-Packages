@@ -10,10 +10,28 @@
             "amazon_domain": "Invalid forwarding email address.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minumim 10)",
+            "token": "Error obtaining token, please check your tenant id, client id, and secret.",
+            "tenant": "Missing tenant ID"
         },
         "step": {
             "user": {
+                "description": "Select mail server authentication method.",
+                "menu_options": {
+                    "manual": "Standard IMAP username and password.",
+                    "o365": "Office 365 oAuth"
+                }
+            },
+            "o365": {
+                "description": "Please enter your oAuth credentials here.\nPlease see [this](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#office-365-wip) section in the wiki on how to setup credentials.",
+                "data": {
+                    "username": "Username",
+                    "tenant": "Tenant ID",
+                    "client_id": "Client ID",
+                    "secret": "Secret"
+                }
+            },
+            "manual": {
                 "data": {
                     "host": "Host",
                     "password": "Password",
@@ -26,30 +44,29 @@
             "config_2": {
                 "data": {
                     "folder": "Mail Folder",
-                    "scan_interval": "Scanning Interval (minutes)",
+                    "resources": "Sensors List",
+                    "scan_interval": "Scanning Interval (minutes, minimum 5)",
                     "image_path": "Image Path",
                     "gif_duration": "Image Duration (seconds)",
                     "image_security": "Random Image Filename",
-                    "generate_mp4": "Create mp4 from images",
-                    "resources": "Sensors List",
                     "imap_timeout": "Time in seconds before connection timeout (seconds, minimum 10)",
-                    "amazon_fwds": "Amazon fowarded email addresses",
-                    "allow_external": "Create image for notification apps",
+                    "generate_mp4": "Create mp4 from images",
+                    "amazon_fwds": "Amazon forwarded email addresses",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Create image for notification apps",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "Finish the configuration by customizing the following based on your email structure and Home Assistant installation.\n\nFor details on the [Mail and Packages integration](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) options review the [configuration, templates, and automations section](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) on GitHub.",
+                "description": "Finish the configuration by customizing the following based on your email structure and Home Assistant installation.\n\nFor details on the [Mail and Packages integration](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) options review the [configuration, templates, and automations section](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) on GitHub.\n\nIf using Amazon forwarded emails please seperate each address with a comma.",
                 "title": "Mail and Packages (Step 2 of 2)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (ie: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
-        },
-        "title": "Mail and Packages"
+        }
     },
     "options": {
         "error": {
@@ -59,10 +76,28 @@
             "amazon_domain": "Invalid forwarding email address.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minumim 10)",
+            "token": "Error obtaining token, please check your tenant id, client id, and secret.",
+            "tenant": "Missing tenant ID"
         },
         "step": {
-            "init": {
+            "user": {
+                "description": "Select mail server authentication method.",
+                "menu_options": {
+                    "manual": "Standard IMAP username and password.",
+                    "o365": "Office 365 oAuth"
+                }
+            },
+            "o365": {
+                "description": "Please enter your oAuth credentials here.\nPlease see [this](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#office-365-wip) section in the wiki on how to setup credentials.",
+                "data": {
+                    "username": "Username",
+                    "tenant": "Tenant ID",
+                    "client_id": "Client ID",
+                    "secret": "Secret"
+                }
+            },
+            "manual": {
                 "data": {
                     "host": "Host",
                     "password": "Password",
@@ -75,29 +110,28 @@
             "options_2": {
                 "data": {
                     "folder": "Mail Folder",
-                    "scan_interval": "Scanning Interval (minutes)",
+                    "resources": "Sensors List",
+                    "scan_interval": "Scanning Interval (minutes, minimum 5)",
                     "image_path": "Image Path",
                     "gif_duration": "Image Duration (seconds)",
                     "image_security": "Random Image Filename",
-                    "generate_mp4": "Create mp4 from images",
-                    "resources": "Sensors List",
                     "imap_timeout": "Time in seconds before connection timeout (seconds, minimum 10)",
+                    "generate_mp4": "Create mp4 from images",
                     "amazon_fwds": "Amazon forwarded email addresses",
-                    "allow_external": "Create image for notification apps",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Create image for notification apps",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "Finish the configuration by customizing the following based on your email structure and Home Assistant installation.\n\nFor details on the [Mail and Packages integration](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) options review the [configuration, templates, and automations section](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) on GitHub.",
+                "description": "Finish the configuration by customizing the following based on your email structure and Home Assistant installation.\n\nFor details on the [Mail and Packages integration](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) options review the [configuration, templates, and automations section](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) on GitHub.\n\nIf using Amazon forwarded emails please seperate each address with a comma.",
                 "title": "Mail and Packages (Step 2 of 2)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (ie: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
         }
-    },
-    "title": "Mail and Packages"
+    }
 }

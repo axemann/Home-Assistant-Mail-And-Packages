@@ -10,46 +10,63 @@
             "amazon_domain": "Invalid forwarding email address.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "",
+            "tenant": ""
         },
         "step": {
             "user": {
-                "data": {
-                    "host": "주최자",
-                    "password": "암호",
-                    "port": "포트",
-                    "username": "사용자 이름"
-                },
                 "description": "메일 서버의 연결 정보를 입력하십시오.",
-                "title": "메일 및 패키지 (1/2 단계)"
+                "menu_options": {
+                    "manual": "",
+                    "o365": ""
+                }
+            },
+            "o365": {
+                "description": "",
+                "data": {
+                    "username": "",
+                    "tenant": "",
+                    "client_id": "",
+                    "secret": ""
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "",
+                    "password": "",
+                    "port": "",
+                    "username": ""
+                },
+                "description": "메일 서버의 연결 정보를 입력해 주세요.",
+                "title": ""
             },
             "config_2": {
                 "data": {
                     "folder": "메일 폴더",
+                    "resources": "Sensors List",
                     "scan_interval": "스캔 간격 (분)",
                     "image_path": "이미지 경로",
                     "gif_duration": "이미지 지속 시간 (초)",
                     "image_security": "임의의 이미지 파일 이름",
-                    "generate_mp4": "이미지에서 mp4 만들기",
-                    "resources": "Sensors List",
                     "imap_timeout": "Time in seconds before connection timeout (seconds, minimum 10)",
+                    "generate_mp4": "이미지에서 mp4 만들기",
                     "amazon_fwds": "Amazon fowarded email addresses",
-                    "allow_external": "Create image for notification apps",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "Create image for notification apps",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "이메일 구조 및 Home Assistant 설치에 따라 다음을 사용자 정의하여 구성을 완료하십시오. \n\n [메일 및 패키지 통합] (https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) 옵션에 대한 자세한 내용은 [구성, 템플릿 및 자동화 섹션] (https://github.com/moralmunky/Home-Assistant-Mail-and-Packages/wiki/Configuration-and-Email-Settings#configuration)",
-                "title": "메일 및 패키지 (2/2 단계)"
+                "description": "이메일 구조 및 Home Assistant 설치에 따라 다음을 사용자 정의하여 구성을 완료하십시오. \n\n [메일 및 패키지 통합] (https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) 옵션에 대한 자세한 내용은 [구성, 템플릿 및 자동화 섹션] (https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-and-Packages\/wiki\/Configuration-and-Email-Settings#configuration)",
+                "title": "메일 및 패키지 (2\/2 단계)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
-        },
-        "title": "Mail and Packages"
+        }
     },
     "options": {
         "error": {
@@ -59,45 +76,62 @@
             "amazon_domain": "잘못된 전달 이메일 주소입니다.",
             "file_not_found": "Image file not found",
             "scan_too_low": "Scan interval too low (minimum 5)",
-            "timeout_too_low": "IMAP timeout too low (minimum 10)"
+            "timeout_too_low": "IMAP timeout too low (minimum 10)",
+            "token": "토큰을 가져오는 중 오류가 발생했습니다. 테넌트 ID, 클라이언트 ID, 비밀번호를 확인해 주세요.",
+            "tenant": "Missing tenant ID"
         },
         "step": {
-            "init": {
+            "user": {
+                "description": "메일 서버 인증 방법을 선택하십시오.",
+                "menu_options": {
+                    "manual": "표준 IMAP 사용자 이름과 비밀번호.",
+                    "o365": "Office 365 oAuth"
+                }
+            },
+            "o365": {
+                "description": "여기에 oAuth 자격 증명을 입력해 주세요.\n자격 증명을 설정하는 방법에 대해서는 [이](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#office-365-wip) 위키 섹션을 참조해 주세요.",
                 "data": {
-                    "host": "주최자",
-                    "password": "암호",
-                    "port": "포트",
+                    "username": "Username",
+                    "tenant": "테넌트 ID",
+                    "client_id": "클라이언트 ID",
+                    "secret": "비밀"
+                }
+            },
+            "manual": {
+                "data": {
+                    "host": "Host",
+                    "password": "Password",
+                    "port": "Port",
                     "username": "사용자 이름"
                 },
-                "description": "메일 서버의 연결 정보를 입력하십시오.",
-                "title": "메일 및 패키지 (1/2 단계)"
+                "description": "메일 서버의 연결 정보를 입력해 주세요.",
+                "title": "우편 및 패키지 (2단계 중 1단계)"
             },
             "options_2": {
                 "data": {
                     "folder": "메일 폴더",
+                    "resources": "센서 목록",
                     "scan_interval": "스캔 간격 (분)",
                     "image_path": "이미지 경로",
                     "gif_duration": "이미지 지속 시간 (초)",
                     "image_security": "임의의 이미지 파일 이름",
-                    "generate_mp4": "이미지에서 mp4 만들기",
-                    "resources": "센서 목록",
                     "imap_timeout": "연결 시간 초과 전 시간 (초, 최소 10 초)",
+                    "generate_mp4": "이미지에서 mp4 만들기",
                     "amazon_fwds": "Amazon forwarded email addresses",
-                    "allow_external": "알림 앱용 이미지 만들기",
                     "amazon_days": "Days back to check for Amazon emails",
+                    "allow_external": "알림 앱용 이미지 만들기",
                     "custom_img": "Use custom 'no image' image?"
                 },
-                "description": "이메일 구조 및 Home Assistant 설치에 따라 다음을 사용자 정의하여 구성을 완료하십시오. \n\n [메일 및 패키지 통합](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) 옵션에 대한 자세한 내용은 [구성, 템플릿 및 자동화 섹션](https://github.com/moralmunky/Home-Assistant-Mail-and-Packages/wiki/Configuration-and-Email-Settings#configuration)",
-                "title": "메일 및 패키지 (2/2 단계)"
+                "description": "이메일 구조 및 Home Assistant 설치에 따라 다음을 사용자 정의하여 구성을 완료하십시오. \n\n [메일 및 패키지 통합](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-And-Packages\/wiki\/Configuration-and-Email-Settings#configuration) 옵션에 대한 자세한 내용은 [구성, 템플릿 및 자동화 섹션](https:\/\/github.com\/moralmunky\/Home-Assistant-Mail-and-Packages\/wiki\/Configuration-and-Email-Settings#configuration)",
+                "title": "메일 및 패키지 (2\/2 단계)"
             },
             "options_3": {
                 "data": {
-                    "custom_img_file": "Path to custom image: (i.e.: images/my_custom_no_mail.jpg)"
+                    "custom_img_file": "Path to custom image: (i.e.: images\/my_custom_no_mail.jpg)"
                 },
-                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images/custom_nomail.gif",
+                "description": "Enter the path and file name to your custom no mail image below.\n\nExample: images\/custom_nomail.gif",
                 "title": "Mail and Packages (Step 3 of 3)"
             }
         }
-    },
-    "title": "Mail and Packages"
+    }
 }

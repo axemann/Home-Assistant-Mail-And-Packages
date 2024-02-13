@@ -98,7 +98,7 @@ def get_resources() -> dict:
     return known_available_resources
 
 
-async def _check_ffmpeg() -> bool:
+async def check_ffmpeg() -> bool:
     """Check if ffmpeg is installed.
 
     Returns boolean
@@ -106,24 +106,32 @@ async def _check_ffmpeg() -> bool:
     return which("ffmpeg")
 
 
-async def _test_login(host: str, port: int, user: str, pwd: str) -> bool:
+async def test_login(host: str, port: int, user: str | None, pwd: str) -> bool:
     """Test IMAP login to specified server.
 
     Returns success boolean
     """
     # Attempt to catch invalid mail server hosts
+
     try:
         account = imaplib.IMAP4_SSL(host, port)
     except Exception as err:
         _LOGGER.error("Error connecting into IMAP Server: %s", str(err))
         return False
     # Validate we can login to mail server
-    try:
-        account.login(user, pwd)
-        return True
-    except Exception as err:
-        _LOGGER.error("Error logging into IMAP Server: %s", str(err))
-        return False
+    if user is None:
+        try:
+            account.authenticate("XOAUTH2", lambda x: pwd.encode("utf-8"))
+        except Exception as err:
+            _LOGGER.error("Error logging into IMAP Server: %s", str(err))
+            return False
+    else:
+        try:
+            account.login(user, pwd)
+            return True
+        except Exception as err:
+            _LOGGER.error("Error logging into IMAP Server: %s", str(err))
+            return False
 
 
 # Email Data helpers
@@ -414,7 +422,7 @@ def fetch(
 
 
 def login(
-    host: str, port: int, user: str, pwd: str
+    host: str, port: int, user: str | None, pwd: str
 ) -> Union[bool, Type[imaplib.IMAP4_SSL]]:
     """Login to IMAP server.
 
@@ -429,11 +437,19 @@ def login(
         return False
 
     # If login fails give error message
-    try:
-        account.login(user, pwd)
-    except Exception as err:
-        _LOGGER.error("Error logging into IMAP Server: %s", str(err))
-        return False
+    if user is None:
+        try:
+            account.authenticate("XOAUTH2", lambda x: pwd.encode("utf-8"))
+        except Exception as err:
+            _LOGGER.error("Error logging into IMAP Server: %s", str(err))
+            return False
+
+    else:
+        try:
+            account.login(user, pwd)
+        except Exception as err:
+            _LOGGER.error("Error logging into IMAP Server: %s", str(err))
+            return False
 
     return account
 

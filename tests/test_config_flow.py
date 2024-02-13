@@ -14,7 +14,7 @@ from custom_components.mail_and_packages.const import (
     CONF_SCAN_INTERVAL,
     DOMAIN,
 )
-from custom_components.mail_and_packages.helpers import _check_ffmpeg, _test_login
+from custom_components.mail_and_packages.helpers import check_ffmpeg, test_login
 from tests.const import FAKE_CONFIG_DATA, FAKE_CONFIG_DATA_BAD
 
 
@@ -142,9 +142,9 @@ async def test_form(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.config_flow.path",
@@ -304,9 +304,9 @@ async def test_form_invalid_custom_img_path(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -361,10 +361,10 @@ async def test_form_connection_error(input_1, step_id_2, hass, mock_imap):
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login",
+        "custom_components.mail_and_packages.config_flow.test_login",
         return_value=False,
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -488,10 +488,10 @@ async def test_form_invalid_ffmpeg(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login",
+        "custom_components.mail_and_packages.config_flow.test_login",
         return_value=True,
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=False,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -631,9 +631,9 @@ async def test_form_index_error(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -777,9 +777,9 @@ async def test_form_index_error_2(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -922,9 +922,9 @@ async def test_form_mailbox_format2(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -953,19 +953,19 @@ async def test_form_mailbox_format2(
 
 @pytest.mark.asyncio
 async def test_valid_ffmpeg(test_valid_ffmpeg):
-    result = await _check_ffmpeg()
+    result = await check_ffmpeg()
     assert result
 
 
 @pytest.mark.asyncio
 async def test_invalid_ffmpeg(test_invalid_ffmpeg):
-    result = await _check_ffmpeg()
+    result = await check_ffmpeg()
     assert not result
 
 
 @pytest.mark.asyncio
 async def test_imap_login(mock_imap):
-    result = await _test_login(
+    result = await test_login(
         "127.0.0.1", 993, "fakeuser@test.email", "suchfakemuchpassword"
     )
     assert result
@@ -973,13 +973,13 @@ async def test_imap_login(mock_imap):
 
 @pytest.mark.asyncio
 async def test_imap_connection_error(caplog):
-    await _test_login("127.0.0.1", 993, "fakeuser@test.email", "suchfakemuchpassword")
+    await test_login("127.0.0.1", 993, "fakeuser@test.email", "suchfakemuchpassword")
     assert "Error connecting into IMAP Server:" in caplog.text
 
 
 @pytest.mark.asyncio
 async def test_imap_login_error(mock_imap_login_error, caplog):
-    await _test_login("127.0.0.1", 993, "fakeuser@test.email", "suchfakemuchpassword")
+    await test_login("127.0.0.1", 993, "fakeuser@test.email", "suchfakemuchpassword")
     assert "Error logging into IMAP Server:" in caplog.text
 
 
@@ -1121,9 +1121,9 @@ async def test_options_flow(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.config_flow.path",
@@ -1297,9 +1297,9 @@ async def test_options_flow_invalid_custom_img_path(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -1369,10 +1369,10 @@ async def test_options_flow_connection_error(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login",
+        "custom_components.mail_and_packages.config_flow.test_login",
         return_value=False,
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -1512,9 +1512,9 @@ async def test_options_flow_invalid_ffmpeg(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=False,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -1660,9 +1660,9 @@ async def test_options_flow_index_error(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -1809,9 +1809,9 @@ async def test_options_flow_index_error_2(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -1958,9 +1958,9 @@ async def test_options_flow_mailbox_format2(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -2112,9 +2112,9 @@ async def test_options_flow_bad(
     # assert result["title"] == title_1
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -2209,9 +2209,9 @@ async def test_form_amazon_error(
     assert result["errors"] == {}
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
@@ -2303,9 +2303,9 @@ async def test_form_interval_low(
     assert result["errors"] == {}
 
     with patch(
-        "custom_components.mail_and_packages.config_flow._test_login", return_value=True
+        "custom_components.mail_and_packages.config_flow.test_login", return_value=True
     ), patch(
-        "custom_components.mail_and_packages.config_flow._check_ffmpeg",
+        "custom_components.mail_and_packages.config_flow.check_ffmpeg",
         return_value=True,
     ), patch(
         "custom_components.mail_and_packages.async_setup", return_value=True
