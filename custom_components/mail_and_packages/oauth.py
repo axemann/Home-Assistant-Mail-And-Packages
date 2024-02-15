@@ -12,6 +12,7 @@ from .const import (
     CONF_O365_TENANT,
     CONF_O365_SCOPE,
     CONF_TOKEN,
+    CONF_GMAIL_SCOPE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -88,7 +89,6 @@ class O365Auth:
                 result["correlation_id"],
             )
             raise TokenError
-
 
 class MissingTenantID(Exception):
     """Exception for missing tenant ID."""
