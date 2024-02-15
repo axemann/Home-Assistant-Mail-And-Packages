@@ -73,8 +73,12 @@ from .const import (
     CONF_DURATION,
     CONF_FOLDER,
     CONF_GENERATE_MP4,
+    CONF_METHOD,
     CONF_PATH,
+    CONF_TOKEN,
+    DATA_SESSION,
     DEFAULT_AMAZON_DAYS,
+    DOMAIN,
     OVERLAY,
     SENSOR_DATA,
     SENSOR_TYPES,
@@ -163,16 +167,21 @@ def process_emails(hass: HomeAssistant, config: ConfigEntry) -> dict:
         pwd = config.get(CONF_PASSWORD)
     folder = config.get(CONF_FOLDER)
     resources = config.get(CONF_RESOURCES)
-    app = None
+    token = None
 
     # Create the dict container
     data = {}
 
     # oAuth check
-    if pwd is None:
+    if config.get(CONF_METHOD) == "o365":
         app = O365Auth(config)
+        app.client()
+        token = app.token
+    if config.get(CONF_METHOD) == "gmail":
+        token = hass.data[DOMAIN][config.entry_id]["token"][CONF_TOKEN]
+
     # Login to email server and select the folder
-    account = login(host, port, user, pwd, app)
+    account = login(host, port, user, pwd, token)
 
     # Do not process if account returns false
     if not account:
@@ -430,7 +439,7 @@ def fetch(
 
 
 def login(
-    host: str, port: int, user: str , pwd: str | None, app: O365Auth | None
+    host: str, port: int, user: str , pwd: str | None, token: str | None
 ) -> Union[bool, Type[imaplib.IMAP4_SSL]]:
     """Login to IMAP server.
 
@@ -445,8 +454,8 @@ def login(
         return False
 
     # If login fails give error message
-    if app:
-        pwd = generate_auth_string(user, app.token)
+    if token:
+        pwd = generate_auth_string(user, token)
         try:
             account.authenticate("XOAUTH2", lambda x: pwd.encode("utf-8"))
         except Exception as err:

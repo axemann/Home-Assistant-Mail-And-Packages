@@ -1,11 +1,16 @@
 """Adds config flow for Mail and Packages."""
-
+from collections.abc import Mapping
 import logging
 from os import path
 from typing import Any
 
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.data_entry_flow import FlowResult
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers import config_entry_oauth2_flow
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import (
@@ -32,10 +37,14 @@ from .const import (
     CONF_IMAP_TIMEOUT,
     CONF_PATH,
     CONF_SCAN_INTERVAL,
-    CONF_O365_CLIENT_ID,
-    CONF_O365_SECRET,
+    CONF_CLIENT_ID,
+    CONF_SECRET,
     CONF_O365_TENANT,
     CONF_OUTLOOK_DEFAULTS,
+    CONF_METHOD,
+    CONF_GMAIL_DEFAULTS,
+    CONF_GMAIL_SCOPE,
+    CONF_TOKEN,
     DEFAULT_ALLOW_EXTERNAL,
     DEFAULT_AMAZON_DAYS,
     DEFAULT_AMAZON_FWDS,
@@ -131,12 +140,13 @@ async def _validate_user_input(user_input: dict) -> tuple:
     return errors, user_input
 
 
-def _get_mailboxes(host: str, port: int, user: str | None, pwd: str) -> list:
+def _get_mailboxes(host: str, port: int, user: str , pwd: str | None, token: str | None) -> list:
     """Get list of mailbox folders from mail server."""
-    if user is None:
-        account = login(host, port, None, pwd)
+    if token:
+        token = {"token": token}
+        account = login(host, port, user, None, token)
     else:
-        account = login(host, port, user, pwd)
+        account = login(host, port, user, pwd, None)
 
     status, folderlist = account.list()
     mailboxes = []
@@ -175,10 +185,10 @@ def _get_schema_step_o365(user_input: list, default_dict: list) -> Any:
                 CONF_O365_TENANT, default=_get_default(CONF_O365_TENANT)
             ): cv.string,
             vol.Required(
-                CONF_O365_CLIENT_ID, default=_get_default(CONF_O365_CLIENT_ID)
+                CONF_CLIENT_ID, default=_get_default(CONF_CLIENT_ID)
             ): cv.string,
             vol.Required(
-                CONF_O365_SECRET, default=_get_default(CONF_O365_SECRET)
+                CONF_SECRET, default=_get_default(CONF_SECRET)
             ): cv.string,
         }
     )
@@ -213,17 +223,17 @@ def _get_schema_step_2(data: list, user_input: list, default_dict: list) -> Any:
         return user_input.get(key, default_dict.get(key, fallback_default))
 
     # No password, likely oAuth login
-    if CONF_PASSWORD not in data:
-        if CONF_O365_TENANT in data:
-            app = O365Auth(data)
-            app.client()
-            password = generate_auth_string(data[CONF_USERNAME], app.token)
-            mailboxes = _get_mailboxes(
-                data[CONF_HOST],
-                data[CONF_PORT],
-                None,
-                password,
-            )
+    if data[CONF_METHOD] == "o365":
+        app = O365Auth(data)
+        app.client()
+        mailboxes = _get_mailboxes(
+            data[CONF_HOST],
+            data[CONF_PORT],
+            data[CONF_USERNAME],
+            None,
+            app.token
+        )
+
     else:
         mailboxes = _get_mailboxes(
             data[CONF_HOST], data[CONF_PORT], data[CONF_USERNAME], data[CONF_PASSWORD]
@@ -282,12 +292,140 @@ def _get_schema_step_3(user_input: list, default_dict: list) -> Any:
     )
 
 
+class OAuth2FlowHandler(
+    config_entry_oauth2_flow.AbstractOAuth2FlowHandler, domain=DOMAIN
+):
+    """Config flow to handle Google Mail OAuth2 authentication."""
+    DOMAIN = DOMAIN
+    reauth_entry: ConfigEntry | None = None
+    _data = {}
+
+    @property
+    def extra_authorize_data(self) -> dict[str, Any]:
+        """Extra data that needs to be appended to the authorize url."""
+        return {
+            "scope": CONF_GMAIL_SCOPE,
+            # Add params to ensure we get back a refresh token
+            "access_type": "offline",
+            "prompt": "consent",
+        }
+    
+    async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> FlowResult:
+        """Perform reauth upon an API authentication error."""
+        self.reauth_entry = self.hass.config_entries.async_get_entry(
+            self.context["entry_id"]
+        )
+        return await self.async_step_reauth_confirm()
+    
+
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Confirm reauth dialog."""
+        if user_input is None:
+            return self.async_show_form(step_id="reauth_confirm")
+        return await self.async_step_user()    
+
+
+    async def async_oauth_create_entry(self, data: dict[str, Any]) -> FlowResult:
+        """Create an entry for the flow, or update existing entry."""
+
+        _LOGGER.debug("oAuth config entry called.")
+
+        if self.reauth_entry:
+            # update the tokens
+            data = self.reauth_entry.data.update(data)
+            self.hass.config_entries.async_update_entry(self.reauth_entry, data=data)
+            await self.hass.config_entries.async_reload(self.reauth_entry.entry_id)
+            return self.async_abort(reason="reauth_successful")
+
+
+        def _get_profile() -> str:
+            """Get profile from inside the executor."""
+            users = build("gmail", "v1", credentials=credentials).users()
+            return users.getProfile(userId="me").execute()["emailAddress"]
+
+        credentials = Credentials(data["token"][CONF_TOKEN])
+        email = await self.hass.async_add_executor_job(_get_profile)
+
+        self._data[CONF_USERNAME] = email
+        self._data[CONF_METHOD] = "gmail"
+
+        return await self._show_config_2(None)
+    
+    async def async_step_config_2(self, user_input=None):
+        """Configure form step 2."""
+        self._errors = {}
+        if user_input is not None:
+            self._errors, user_input = await _validate_user_input(user_input)
+            self._data.update(user_input)
+            if len(self._errors) == 0:
+                if self._data[CONF_CUSTOM_IMG]:
+                    return await self.async_step_config_3()
+                return self.async_create_entry(
+                    title=self._data[CONF_HOST], data=self._data
+                )
+            return await self._show_config_2(user_input)
+
+        return await self._show_config_2(user_input)
+
+    async def _show_config_2(self, user_input):
+        """Step 2 setup."""
+        # Defaults
+        defaults = {
+            CONF_FOLDER: DEFAULT_FOLDER,
+            CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+            CONF_PATH: self.hass.config.path() + DEFAULT_PATH,
+            CONF_DURATION: DEFAULT_GIF_DURATION,
+            CONF_IMAGE_SECURITY: DEFAULT_IMAGE_SECURITY,
+            CONF_IMAP_TIMEOUT: DEFAULT_IMAP_TIMEOUT,
+            CONF_AMAZON_FWDS: DEFAULT_AMAZON_FWDS,
+            CONF_AMAZON_DAYS: DEFAULT_AMAZON_DAYS,
+            CONF_GENERATE_MP4: False,
+            CONF_ALLOW_EXTERNAL: DEFAULT_ALLOW_EXTERNAL,
+            CONF_CUSTOM_IMG: DEFAULT_CUSTOM_IMG,
+        }
+
+        return self.async_show_form(
+            step_id="config_2",
+            data_schema=_get_schema_step_2(self._data, user_input, defaults),
+            errors=self._errors,
+        )
+
+    async def async_step_config_3(self, user_input=None):
+        """Configure form step 2."""
+        self._errors = {}
+        if user_input is not None:
+            self._data.update(user_input)
+            self._errors, user_input = await _validate_user_input(self._data)
+            if len(self._errors) == 0:
+                return self.async_create_entry(
+                    title=self._data[CONF_HOST], data=self._data
+                )
+            return await self._show_config_3(user_input)
+
+        return await self._show_config_3(user_input)
+
+    async def _show_config_3(self, user_input):
+        """Step 3 setup."""
+        # Defaults
+        defaults = {
+            CONF_CUSTOM_IMG_FILE: DEFAULT_CUSTOM_IMG_FILE,
+        }
+
+        return self.async_show_form(
+            step_id="config_3",
+            data_schema=_get_schema_step_3(user_input, defaults),
+            errors=self._errors,
+        )    
+
 @config_entries.HANDLERS.register(DOMAIN)
 class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for Mail and Packages."""
 
     VERSION = 4
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
+    reauth_entry: ConfigEntry | None = None
 
     def __init__(self):
         """Initialize."""
@@ -307,6 +445,7 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         self._errors = {}
 
         if user_input is not None:
+            user_input[CONF_METHOD] = "o365"
             user_input.update(CONF_OUTLOOK_DEFAULTS)
             self._data.update(user_input)
             app = O365Auth(user_input)
@@ -339,16 +478,17 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         defaults = {}
 
         return self.async_show_form(
-            step_id="user",
+            step_id="o365",
             data_schema=_get_schema_step_o365(user_input, defaults),
             errors=self._errors,
         )
-
+    
     async def async_step_manual(self, user_input=None):
         """Handle a flow initialized by the user."""
         self._errors = {}
 
         if user_input is not None:
+            user_input[CONF_METHOD] = "standard"
             self._data.update(user_input)
             valid = await test_login(
                 user_input[CONF_HOST],
@@ -373,7 +513,7 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         }
 
         return self.async_show_form(
-            step_id="user",
+            step_id="manual",
             data_schema=_get_schema_step_1(user_input, defaults),
             errors=self._errors,
         )

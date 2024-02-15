@@ -2,14 +2,16 @@
 
 import logging
 import msal
+
 from homeassistant.config_entries import ConfigEntry
 
 from .const import (
-    CONF_O365_CLIENT_ID,
-    CONF_O365_SECRET,
+    CONF_CLIENT_ID,
+    CONF_SECRET,
     CONF_O365_TENANT,
     CONF_O365_SCOPE,
     CONF_TOKEN,
+    CONF_GMAIL_SCOPE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -20,7 +22,7 @@ def generate_auth_string(user, token) -> str:
 
 
 class O365Auth:
-    """Class for Mail and Packages OAuth handling."""
+    """Class for Mail and Packages Office365 handling."""
 
     def __init__(self, config: ConfigEntry) -> None:
         """Initialize."""
@@ -43,9 +45,9 @@ class O365Auth:
     def client(self) -> None:
         """Setup client oauth."""
         app = msal.ConfidentialClientApplication(
-            self.config[CONF_O365_CLIENT_ID],
+            self.config[CONF_CLIENT_ID],
             self._authority,
-            self.config[CONF_O365_SECRET],
+            self.config[CONF_SECRET],
         )
 
         result = app.acquire_token_silent(self._scope, account=None)
@@ -64,7 +66,6 @@ class O365Auth:
                 result["correlation_id"],
             )
             raise TokenError
-
 
 class MissingTenantID(Exception):
     """Exception for missing tenant ID."""

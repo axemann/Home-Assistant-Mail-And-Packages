@@ -1,5 +1,6 @@
 """Mail and Packages Integration."""
 
+import aiohttp
 import asyncio
 import logging
 from datetime import timedelta
@@ -7,8 +8,12 @@ from datetime import timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_RESOURCES
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.helpers.config_entry_oauth2_flow import (
+    OAuth2Session,
+    async_get_config_entry_implementation,
+)
 
 from .const import (
     CONF_ALLOW_EXTERNAL,
@@ -16,9 +21,11 @@ from .const import (
     CONF_AMAZON_FWDS,
     CONF_IMAGE_SECURITY,
     CONF_IMAP_TIMEOUT,
+    CONF_METHOD,
     CONF_PATH,
     CONF_SCAN_INTERVAL,
     COORDINATOR,
+    DATA_SESSION,
     DEFAULT_AMAZON_DAYS,
     DEFAULT_IMAP_TIMEOUT,
     DOMAIN,
@@ -86,6 +93,21 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
     config_entry.options = config_entry.data
     config = config_entry.data
+
+    if config.get(CONF_METHOD) == "gmail":
+        implementation = await async_get_config_entry_implementation(hass, config_entry)
+        session = OAuth2Session(hass, config_entry, implementation)
+        try:
+            await session.async_ensure_token_valid()
+        except aiohttp.ClientResponseError as err:
+            if 400 <= err.status < 500:
+                raise ConfigEntryAuthFailed(
+                    "OAuth session is not valid, reauth required"
+                ) from err
+            raise ConfigEntryNotReady from err
+        except aiohttp.ClientError as err:
+            raise ConfigEntryNotReady from err
+        hass.data[DOMAIN][config_entry.entry_id][DATA_SESSION] = session
 
     # Variables for data coordinator
     host = config.get(CONF_HOST)

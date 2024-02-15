@@ -22,6 +22,7 @@ COORDINATOR = "coordinator_mail"
 OVERLAY = ["overlay.png", "vignette.png", "white.png"]
 SERVICE_UPDATE_FILE_PATH = "update_file_path"
 CAMERA = "cameras"
+DATA_SESSION: Final = "session"
 
 # Attributes
 ATTR_AMAZON_IMAGE = "amazon_image"
@@ -54,6 +55,10 @@ CONF_IMAP_TIMEOUT = "imap_timeout"
 CONF_GENERATE_MP4 = "generate_mp4"
 CONF_AMAZON_FWDS = "amazon_fwds"
 CONF_AMAZON_DAYS = "amazon_days"
+CONF_METHOD = "method"
+# OAuth
+CONF_CLIENT_ID = "client_id"
+CONF_SECRET = "secret"
 CONF_TOKEN = "access_token"
 
 # Office 365 Config
@@ -62,9 +67,14 @@ CONF_OUTLOOK_DEFAULTS = {
     "port": 993,
 }
 CONF_O365_TENANT = "tenant"
-CONF_O365_CLIENT_ID = "client_id"
-CONF_O365_SECRET = "secret"
 CONF_O365_SCOPE = "https://outlook.office365.com/.default"
+
+# GMail Config
+CONF_GMAIL_DEFAULTS = {
+    "host": "imap.gmail.com",
+    "port": 993,
+}
+CONF_GMAIL_SCOPE = "https://www.googleapis.com/auth/gmail.readonly"
 
 # Defaults
 DEFAULT_CAMERA_NAME = "Mail USPS Camera"
