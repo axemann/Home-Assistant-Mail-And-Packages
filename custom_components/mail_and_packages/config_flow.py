@@ -448,12 +448,12 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             user_input[CONF_METHOD] = "o365"
             user_input.update(CONF_OUTLOOK_DEFAULTS)
             self._data.update(user_input)
-            app = O365Auth(user_input)
+            app = O365Auth(self.hass, user_input)
             self._problem = None
             valid = False
 
             try:
-                app.client()
+                await app.client()
                 valid = True
             except TokenError:
                 _LOGGER.error("Problems obtaining oAuth token.")
@@ -605,7 +605,7 @@ class MailAndPackagesOptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             self._data.update(user_input)
 
-            valid = await _test_login(
+            valid = await test_login(
                 user_input[CONF_HOST],
                 user_input[CONF_PORT],
                 user_input[CONF_USERNAME],

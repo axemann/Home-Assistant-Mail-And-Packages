@@ -4,6 +4,7 @@ import logging
 import msal
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 
 from .const import (
     CONF_CLIENT_ID,
@@ -11,7 +12,6 @@ from .const import (
     CONF_O365_TENANT,
     CONF_O365_SCOPE,
     CONF_TOKEN,
-    CONF_GMAIL_SCOPE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -24,8 +24,9 @@ def generate_auth_string(user, token) -> str:
 class O365Auth:
     """Class for Mail and Packages Office365 handling."""
 
-    def __init__(self, config: ConfigEntry) -> None:
+    def __init__(self, hass: HomeAssistant, config: ConfigEntry) -> None:
         """Initialize."""
+        self.hass = hass
         self.token = None
         self.config = config
         self._scope = CONF_O365_SCOPE
@@ -42,19 +43,32 @@ class O365Auth:
             f"https://login.microsoftonline.com/{self.config[CONF_O365_TENANT]}"
         )
 
-    def client(self) -> None:
+    async def client(self) -> None:
         """Setup client oauth."""
-        app = msal.ConfidentialClientApplication(
+        if not self._authority:
+            self._authority = (
+                f"https://login.microsoftonline.com/{self.config[CONF_O365_TENANT]}"
+            )
+        _LOGGER.debug("Authority: %s", self._authority)
+        app = await self.hass.async_add_executor_job(
+            msal.ConfidentialClientApplication,
             self.config[CONF_CLIENT_ID],
-            self._authority,
             self.config[CONF_SECRET],
+            self._authority,
         )
 
-        result = app.acquire_token_silent(self._scope, account=None)
+        result = await self.hass.async_add_executor_job(
+                app.acquire_token_silent,
+                self._scope, 
+                None,
+            )
 
         if not result:
             _LOGGER.debug("No token cached, getting new token.")
-            result = app.acquire_token_for_client(self._scope)
+            result = await self.hass.async_add_executor_job(
+                    app.acquire_token_for_client,
+                    self._scope,
+                )
 
         if CONF_TOKEN in result:
             self.token = result[CONF_TOKEN]
