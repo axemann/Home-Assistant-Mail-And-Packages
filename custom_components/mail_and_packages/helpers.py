@@ -112,7 +112,9 @@ async def check_ffmpeg() -> bool:
     return which("ffmpeg")
 
 
-async def test_login(host: str, port: int, user: str | None, pwd: str) -> bool:
+def test_login(
+    host: str, port: int, user: str | None, pwd: str, token: str | None
+) -> bool:
     """Test IMAP login to specified server.
 
     Returns success boolean
@@ -125,7 +127,8 @@ async def test_login(host: str, port: int, user: str | None, pwd: str) -> bool:
         _LOGGER.error("Error connecting into IMAP Server: %s", str(err))
         return False
     # Validate we can login to mail server
-    if user is None:
+    if token:
+        pwd = generate_auth_string(user, token)
         try:
             account.authenticate("XOAUTH2", lambda x: pwd.encode("utf-8"))
         except Exception as err:
@@ -439,7 +442,7 @@ def fetch(
 
 
 def login(
-    host: str, port: int, user: str , pwd: str | None, token: str | None
+    host: str, port: int, user: str, pwd: str | None, token: str | None
 ) -> Union[bool, Type[imaplib.IMAP4_SSL]]:
     """Login to IMAP server.
 

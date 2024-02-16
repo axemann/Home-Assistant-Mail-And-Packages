@@ -17,7 +17,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-def generate_auth_string(user, token) -> str:
+def generate_auth_string(user: str, token: str) -> str:
     return f"user={user}\x01auth=Bearer {token}\x01\x01"
 
 
@@ -58,17 +58,17 @@ class O365Auth:
         )
 
         result = await self.hass.async_add_executor_job(
-                app.acquire_token_silent,
-                self._scope, 
-                None,
-            )
+            app.acquire_token_silent,
+            self._scope,
+            None,
+        )
 
         if not result:
             _LOGGER.debug("No token cached, getting new token.")
             result = await self.hass.async_add_executor_job(
-                    app.acquire_token_for_client,
-                    self._scope,
-                )
+                app.acquire_token_for_client,
+                self._scope,
+            )
 
         if CONF_TOKEN in result:
             self.token = result[CONF_TOKEN]
@@ -80,6 +80,7 @@ class O365Auth:
                 result["correlation_id"],
             )
             raise TokenError
+
 
 class MissingTenantID(Exception):
     """Exception for missing tenant ID."""

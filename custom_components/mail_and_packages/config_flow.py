@@ -1,4 +1,5 @@
 """Adds config flow for Mail and Packages."""
+
 from collections.abc import Mapping
 import logging
 from os import path
@@ -8,6 +9,7 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers import config_entry_oauth2_flow
@@ -140,10 +142,11 @@ async def _validate_user_input(user_input: dict) -> tuple:
     return errors, user_input
 
 
-def _get_mailboxes(host: str, port: int, user: str , pwd: str | None, token: str | None) -> list:
+def _get_mailboxes(
+    host: str, port: int, user: str, pwd: str | None, token: str | None
+) -> list:
     """Get list of mailbox folders from mail server."""
     if token:
-        token = {"token": token}
         account = login(host, port, user, None, token)
     else:
         account = login(host, port, user, pwd, None)
@@ -187,9 +190,7 @@ def _get_schema_step_o365(user_input: list, default_dict: list) -> Any:
             vol.Required(
                 CONF_CLIENT_ID, default=_get_default(CONF_CLIENT_ID)
             ): cv.string,
-            vol.Required(
-                CONF_SECRET, default=_get_default(CONF_SECRET)
-            ): cv.string,
+            vol.Required(CONF_SECRET, default=_get_default(CONF_SECRET)): cv.string,
         }
     )
 
@@ -213,7 +214,9 @@ def _get_schema_step_1(user_input: list, default_dict: list) -> Any:
     )
 
 
-def _get_schema_step_2(data: list, user_input: list, default_dict: list) -> Any:
+async def _get_schema_step_2(
+    data: list, user_input: list, default_dict: list, hass: HomeAssistant | None = None
+) -> Any:
     """Get a schema using the default_dict as a backup."""
     if user_input is None:
         user_input = {}
@@ -224,14 +227,10 @@ def _get_schema_step_2(data: list, user_input: list, default_dict: list) -> Any:
 
     # No password, likely oAuth login
     if data[CONF_METHOD] == "o365":
-        app = O365Auth(data)
-        app.client()
+        app = O365Auth(hass, data)
+        await app.client()
         mailboxes = _get_mailboxes(
-            data[CONF_HOST],
-            data[CONF_PORT],
-            data[CONF_USERNAME],
-            None,
-            app.token
+            data[CONF_HOST], data[CONF_PORT], data[CONF_USERNAME], None, app.token
         )
 
     else:
@@ -296,6 +295,7 @@ class OAuth2FlowHandler(
     config_entry_oauth2_flow.AbstractOAuth2FlowHandler, domain=DOMAIN
 ):
     """Config flow to handle Google Mail OAuth2 authentication."""
+
     DOMAIN = DOMAIN
     reauth_entry: ConfigEntry | None = None
     _data = {}
@@ -309,14 +309,13 @@ class OAuth2FlowHandler(
             "access_type": "offline",
             "prompt": "consent",
         }
-    
+
     async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> FlowResult:
         """Perform reauth upon an API authentication error."""
         self.reauth_entry = self.hass.config_entries.async_get_entry(
             self.context["entry_id"]
         )
         return await self.async_step_reauth_confirm()
-    
 
     async def async_step_reauth_confirm(
         self, user_input: dict[str, Any] | None = None
@@ -324,8 +323,7 @@ class OAuth2FlowHandler(
         """Confirm reauth dialog."""
         if user_input is None:
             return self.async_show_form(step_id="reauth_confirm")
-        return await self.async_step_user()    
-
+        return await self.async_step_user()
 
     async def async_oauth_create_entry(self, data: dict[str, Any]) -> FlowResult:
         """Create an entry for the flow, or update existing entry."""
@@ -339,7 +337,6 @@ class OAuth2FlowHandler(
             await self.hass.config_entries.async_reload(self.reauth_entry.entry_id)
             return self.async_abort(reason="reauth_successful")
 
-
         def _get_profile() -> str:
             """Get profile from inside the executor."""
             users = build("gmail", "v1", credentials=credentials).users()
@@ -352,7 +349,7 @@ class OAuth2FlowHandler(
         self._data[CONF_METHOD] = "gmail"
 
         return await self._show_config_2(None)
-    
+
     async def async_step_config_2(self, user_input=None):
         """Configure form step 2."""
         self._errors = {}
@@ -388,7 +385,9 @@ class OAuth2FlowHandler(
 
         return self.async_show_form(
             step_id="config_2",
-            data_schema=_get_schema_step_2(self._data, user_input, defaults),
+            data_schema=await _get_schema_step_2(
+                self._data, user_input, defaults, self.hass
+            ),
             errors=self._errors,
         )
 
@@ -417,7 +416,8 @@ class OAuth2FlowHandler(
             step_id="config_3",
             data_schema=_get_schema_step_3(user_input, defaults),
             errors=self._errors,
-        )    
+        )
+
 
 @config_entries.HANDLERS.register(DOMAIN)
 class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -454,18 +454,24 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
             try:
                 await app.client()
-                valid = True
+                valid = test_login(
+                    user_input[CONF_HOST],
+                    user_input[CONF_PORT],
+                    user_input[CONF_USERNAME],
+                    None,
+                    app.token,
+                )
             except TokenError:
                 _LOGGER.error("Problems obtaining oAuth token.")
-                self._problem = "token"
+                self._errors["base"] = "token"
             except MissingTenantID:
                 _LOGGER.error("Missing tenant ID.")
-                self._problem = "tenant"
+                self._errors["base"] = "tenant"
 
             if not valid:
-                self._errors["base"] = self._problem
-            else:
+                self._errors["base"] = "communication"
 
+            if not self._errors:
                 return await self.async_step_config_2()
 
             return await self._show_config_o365(user_input)
@@ -482,7 +488,7 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=_get_schema_step_o365(user_input, defaults),
             errors=self._errors,
         )
-    
+
     async def async_step_manual(self, user_input=None):
         """Handle a flow initialized by the user."""
         self._errors = {}
@@ -553,7 +559,9 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="config_2",
-            data_schema=_get_schema_step_2(self._data, user_input, defaults),
+            data_schema=await _get_schema_step_2(
+                self._data, user_input, defaults, self.hass
+            ),
             errors=self._errors,
         )
 
@@ -662,7 +670,7 @@ class MailAndPackagesOptionsFlow(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="options_2",
-            data_schema=_get_schema_step_2(self._data, user_input, defaults),
+            data_schema=await _get_schema_step_2(self._data, user_input, defaults),
             errors=self._errors,
         )
 
