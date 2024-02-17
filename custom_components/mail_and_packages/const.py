@@ -67,7 +67,9 @@ CONF_OUTLOOK_DEFAULTS = {
     "port": 993,
 }
 CONF_O365_TENANT = "tenant"
-CONF_O365_SCOPE = ["https://outlook.office365.com/.default"]
+CONF_O365_SCOPE = [
+    "https://graph.microsoft.com/.default",
+    ]
 
 # GMail Config
 CONF_GMAIL_DEFAULTS = {

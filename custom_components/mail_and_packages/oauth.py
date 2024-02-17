@@ -42,6 +42,7 @@ class O365Auth:
         self._authority = (
             f"https://login.microsoftonline.com/{self.config[CONF_O365_TENANT]}"
         )
+        
 
     async def client(self) -> None:
         """Setup client oauth."""
