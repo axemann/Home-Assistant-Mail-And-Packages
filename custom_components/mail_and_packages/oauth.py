@@ -20,6 +20,13 @@ _LOGGER = logging.getLogger(__name__)
 def generate_auth_string(user: str, token: str) -> str:
     return f"user={user}\x01auth=Bearer {token}\x01\x01"
 
+def generate_oauth_url(service: str, client_id: str, tenant_id: str | None, webhook: str) -> str:
+    """Generate and return URL for oAuth."""
+    if service == "o365":
+        url = f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/authorize?client_id={client_id}&response_type=code&redirect_uri={webhook}&response_mode=query&scope=offline_access%20Mail.ReadWrite&state=12345644"
+    if service == "gmail":
+        url = ""
+    return url
 
 class O365Auth:
     """Class for Mail and Packages Office365 handling."""
@@ -40,7 +47,7 @@ class O365Auth:
             _LOGGER.error("No tenant ID configured.")
             raise MissingTenantID
         self._authority = (
-            f"https://login.microsoftonline.com/{self.config[CONF_O365_TENANT]}"
+            f"https://login.microsoftonline.com/common"
         )
         
 
@@ -48,7 +55,7 @@ class O365Auth:
         """Setup client oauth."""
         if not self._authority:
             self._authority = (
-                f"https://login.microsoftonline.com/{self.config[CONF_O365_TENANT]}"
+                f"https://login.microsoftonline.com/common"
             )
         _LOGGER.debug("Authority: %s", self._authority)
         app = await self.hass.async_add_executor_job(

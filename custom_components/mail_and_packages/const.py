@@ -56,6 +56,7 @@ CONF_GENERATE_MP4 = "generate_mp4"
 CONF_AMAZON_FWDS = "amazon_fwds"
 CONF_AMAZON_DAYS = "amazon_days"
 CONF_METHOD = "method"
+CONF_CLOUDHOOK_URL = "cloudhook_url"
 # OAuth
 CONF_CLIENT_ID = "client_id"
 CONF_SECRET = "secret"
@@ -67,9 +68,7 @@ CONF_OUTLOOK_DEFAULTS = {
     "port": 993,
 }
 CONF_O365_TENANT = "tenant"
-CONF_O365_SCOPE = [
-    "https://graph.microsoft.com/.default",
-    ]
+CONF_O365_SCOPE = "offline_access Mail.ReadWrite"
 
 # GMail Config
 CONF_GMAIL_DEFAULTS = {

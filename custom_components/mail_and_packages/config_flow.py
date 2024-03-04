@@ -24,7 +24,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import callback
 
-from .oauth import O365Auth, TokenError, MissingTenantID, generate_auth_string
+from .oauth import O365Auth, TokenError, MissingTenantID, generate_auth_string, generate_oauth_url
 
 from .const import (
     CONF_ALLOW_EXTERNAL,
@@ -437,6 +437,23 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle the flow initialized by the user."""
         return self.async_show_menu(step_id="user", menu_options=MENU_OPTIONS)
+    
+    async def async_step_o365_auth(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Office 365 authorizationflow."""
+        self._errors = {}
+        url = generate_oauth_url("o365",self._data[CONF_CLIENT_ID], self._data[CONF_O365_TENANT])
+
+        if user_input is not None:
+            self.refresh_token = user_input.get(CONF_TOKEN)
+            _LOGGER.debug("user_input: %s", user_input)
+
+            if not self._errors:
+                return await self.async_step_config_2()
+            
+        return self.async_external_step(step_id="o365_auth", url=url)
+
 
     async def async_step_o365(
         self, user_input: dict[str, Any] | None = None
@@ -448,31 +465,31 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             user_input[CONF_METHOD] = "o365"
             user_input.update(CONF_OUTLOOK_DEFAULTS)
             self._data.update(user_input)
-            app = O365Auth(self.hass, user_input)
-            self._problem = None
-            valid = False
+            # app = O365Auth(self.hass, user_input)
+            # self._problem = None
+            # valid = False
 
-            try:
-                await app.client()
-                valid = test_login(
-                    user_input[CONF_HOST],
-                    user_input[CONF_PORT],
-                    user_input[CONF_USERNAME],
-                    None,
-                    app.token,
-                )
-            except TokenError:
-                _LOGGER.error("Problems obtaining oAuth token.")
-                self._errors["base"] = "token"
-            except MissingTenantID:
-                _LOGGER.error("Missing tenant ID.")
-                self._errors["base"] = "tenant"
+            # try:
+            #     await app.client()
+            #     valid = test_login(
+            #         user_input[CONF_HOST],
+            #         user_input[CONF_PORT],
+            #         user_input[CONF_USERNAME],
+            #         None,
+            #         app.token,
+            #     )
+            # except TokenError:
+            #     _LOGGER.error("Problems obtaining oAuth token.")
+            #     self._errors["base"] = "token"
+            # except MissingTenantID:
+            #     _LOGGER.error("Missing tenant ID.")
+            #     self._errors["base"] = "tenant"
 
-            if not valid:
-                self._errors["base"] = "communication"
+            # if not valid:
+            #     self._errors["base"] = "communication"
 
             if not self._errors:
-                return await self.async_step_config_2()
+                return await self.async_step_o365_auth()
 
             return await self._show_config_o365(user_input)
 
