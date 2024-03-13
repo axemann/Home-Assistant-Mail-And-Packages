@@ -84,7 +84,7 @@ async def _check_amazon_forwards(forwards: str) -> tuple:
         amazon_forwards_list = forwards.split(",")
 
     # No forwards
-    elif forwards in ["", "(none)", ""]:
+    elif forwards in ["", "(none)", '""']:
         amazon_forwards_list = []
 
     # If only one address append it to the list
@@ -207,7 +207,7 @@ def _get_schema_step_1(user_input: list, default_dict: list) -> Any:
     return vol.Schema(
         {
             vol.Required(CONF_HOST, default=_get_default(CONF_HOST)): cv.string,
-            vol.Required(CONF_PORT, default=_get_default(CONF_PORT)): vol.Coerce(int),
+            vol.Required(CONF_PORT, default=_get_default(CONF_PORT, 993)): cv.port,
             vol.Required(CONF_USERNAME, default=_get_default(CONF_USERNAME)): cv.string,
             vol.Required(CONF_PASSWORD, default=_get_default(CONF_PASSWORD)): cv.string,
         }
@@ -423,7 +423,7 @@ class OAuth2FlowHandler(
 class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for Mail and Packages."""
 
-    VERSION = 4
+    VERSION = 5
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
     reauth_entry: ConfigEntry | None = None
 
