@@ -7,6 +7,7 @@ Icon
 # Thumbnails
 ._*
 
+custom_components/mail_and_packages/__pycache*
 custom_components/mail_and_packages/camera.py.old
 custom_components/mail_and_packages/.backup/__init__.py
 custom_components/mail_and_packages/.backup/camera.py
@@ -77,3 +78,7 @@ virtualization/vagrant/config
 # Typing
 .mypy_cache
 *.pyc
+
+# Home Assistant configuration
+config/*
+!config/configuration.yaml
